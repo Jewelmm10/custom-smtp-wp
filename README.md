@@ -1,91 +1,83 @@
-#Custom SMTP for WordPress (Without Plugin)
+# Custom SMTP for WordPress (Without Plugin)
 
-This project provides a custom SMTP configuration for WordPress using Gmail's SMTP server. It modifies the functions.php file to send emails without relying on plugins.
+This project provides a custom SMTP configuration for WordPress using Gmail's SMTP server. It modifies the `functions.php` file to send emails without relying on plugins.
 
-Features
+## Features
 
-Uses Gmail's SMTP server for email delivery.
+- Uses Gmail's SMTP server for email delivery.
+- No need for additional plugins.
+- Secure authentication with an App Password.
+- Easily configurable within `functions.php`.
 
-No need for additional plugins.
+## Prerequisites
 
-Secure authentication with an App Password.
+- A Gmail account.
+- An App Password generated from your Gmail account ([Google App Password Guide](https://support.google.com/accounts/answer/185833)).
+- A WordPress website with access to `functions.php`.
 
-Easily configurable within functions.php.
+## Installation
 
-Prerequisites
+1. **Generate a Gmail App Password:**
 
-A Gmail account.
+   - Go to [Google App Passwords](https://myaccount.google.com/apppasswords).
+   - Generate a password for "Mail" and "Other (Custom name)".
+   - Copy the generated password.
 
-An App Password generated from your Gmail account (Google App Password Guide).
+2. **Edit ****\`\`**** in Your Theme:**
 
-A WordPress website with access to functions.php.
+   - Open your WordPress theme's `functions.php` file.
+   - Add the following code:
 
-Installation
+   ```php
+   // SMTP mail configuration
+   function custom_smtp_mail_config($phpmailer) {
+       $phpmailer->isSMTP();
+       $phpmailer->Host = 'smtp.gmail.com';
+       $phpmailer->SMTPAuth = true;
+       $phpmailer->Port = 587;
+       $phpmailer->Username = 'your-email@gmail.com';
+       $phpmailer->Password = 'your-app-password';
+       $phpmailer->SMTPSecure = 'tls';
+       $phpmailer->From = 'your-email@gmail.com';
+       $phpmailer->FromName = 'Your Name';
+   }
+   add_action('phpmailer_init', 'custom_smtp_mail_config');
+   ```
 
-Generate a Gmail App Password:
+   - Replace `your-email@gmail.com` with your Gmail address.
+   - Replace `your-app-password` with the generated App Password.
 
-Go to Google App Passwords.
+3. **Test Email Sending:**
 
-Generate a password for "Mail" and "Other (Custom name)".
+   - Add the following function in `functions.php`:
 
-Copy the generated password.
+   ```php
+   function send_test_email() {
+       $to = 'recipient-email@example.com'; // Replace with the recipient's email
+       $subject = 'Test Email from WordPress';
+       $message = 'This is a test email sent using custom SMTP settings.';
+       $headers = array('Content-Type: text/html; charset=UTF-8');
 
-Edit `` in Your Theme:
+       if (wp_mail($to, $subject, $message, $headers)) {
+           echo 'Test email sent successfully!';
+       } else {
+           echo 'Failed to send test email.';
+       }
+   }
+   // Uncomment the line below to send a test email
+   // add_action('init', 'send_test_email');
+   ```
 
-Open your WordPress theme's functions.php file.
+   - Replace `recipient-email@example.com` with your desired email address.
+   - Uncomment `add_action('init', 'send_test_email');` to send a test email.
 
-Add the following code:
+## Security Note
 
-// SMTP mail configuration
-function custom_smtp_mail_config($phpmailer) {
-    $phpmailer->isSMTP();
-    $phpmailer->Host = 'smtp.gmail.com';
-    $phpmailer->SMTPAuth = true;
-    $phpmailer->Port = 587;
-    $phpmailer->Username = 'your-email@gmail.com';
-    $phpmailer->Password = 'your-app-password';
-    $phpmailer->SMTPSecure = 'tls';
-    $phpmailer->From = 'your-email@gmail.com';
-    $phpmailer->FromName = 'Your Name';
-}
-add_action('phpmailer_init', 'custom_smtp_mail_config');
+- Never hardcode sensitive credentials in public repositories.
+- Use environment variables or a WordPress configuration file to securely store credentials.
+- Avoid exposing your App Password in any public forum or repository.
 
-Replace your-email@gmail.com with your Gmail address.
-
-Replace your-app-password with the generated App Password.
-
-Test Email Sending:
-
-Add the following function in functions.php:
-
-function send_test_email() {
-    $to = 'recipient-email@example.com'; // Replace with the recipient's email
-    $subject = 'Test Email from WordPress';
-    $message = 'This is a test email sent using custom SMTP settings.';
-    $headers = array('Content-Type: text/html; charset=UTF-8');
-
-    if (wp_mail($to, $subject, $message, $headers)) {
-        echo 'Test email sent successfully!';
-    } else {
-        echo 'Failed to send test email.';
-    }
-}
-// Uncomment the line below to send a test email
-// add_action('init', 'send_test_email');
-
-Replace recipient-email@example.com with your desired email address.
-
-Uncomment add_action('init', 'send_test_email'); to send a test email.
-
-Security Note
-
-Never hardcode sensitive credentials in public repositories.
-
-Use environment variables or a WordPress configuration file to securely store credentials.
-
-Avoid exposing your App Password in any public forum or repository.
-
-License
+## License
 
 This project is open-source and licensed under the MIT License.
 
